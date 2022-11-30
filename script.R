@@ -1,10 +1,22 @@
-# Importing dataset
+# Installing necessary libraries
+
+install.packages("coin")
+
+# Importing necessary libraries
 
 library(haven) #necessary for read_sav
+library(ggplot2)
+library(coin)
+library(dplyr)
+library(car)
+
+# Importing the dataset
+
 data <- read_sav('GenderEqualityIndex.sav')
 
-#First question
-#Get mean, median, sd, min and max
+# First question
+
+# Get mean, median, sd, min and max
 
 desc.stat <- function(x) {
   paste('Mean =', mean(x), 
@@ -19,8 +31,10 @@ desc.stat(data$Segregationandqualityofwork)
 
 
 # Indicator with the smaller variance is:
-print(paste('Variance of Participation is:', var(data$Participation),
-            'Variance of Segregation and quality of work is:', var(data$Segregationandqualityofwork)))
+print(paste('Variance of Participation is:', 
+            var(data$Participation),
+            'Variance of Segregation and quality of work is:', 
+            var(data$Segregationandqualityofwork)))
 
 # Median of Parititipation compared to Segregation and quality of work
 if (median(data$Participation) > median(data$Segregationandqualityofwork)) {
@@ -40,7 +54,7 @@ print(paste('Interquartile range of Participation is:',
 # Question number two
 table(data$Time)
 
-#Question number three
+# Question number three
 
 # Testing the normality of distribution
 shapiro.test(data$Financialresources)
@@ -49,3 +63,66 @@ shapiro.test(data$Financialresources)
 
 aov.fin.pow <- aov(data$Financialresources ~ data$Power)
 summary(aov.fin.pow)
+
+# Question number four
+
+data_4 <- filter(data, Work == 2 | Work == 3)
+
+shapiro.test(data_4$Notatriskofpoverty)
+
+data_4$Work <- as.factor(data_4$Work)
+
+t.test(data_4$Notatriskofpoverty~data_4$Work)
+
+ggplot(data_4, aes(x=Work, y=Notatriskofpoverty)) + 
+  geom_boxplot()
+
+# Question number five
+
+shapiro.test(data$Economicsituation)
+shapiro.test(data$Segregation)
+
+cor.test(data$Economicsituation, data$Segregation)
+
+ggplot(data, aes(x=Economicsituation, y=Segregation)) +
+  geom_point()
+
+# Question number six
+
+table(data$Power, data$Money)
+
+class(data$Money)
+class(data$Power)
+
+data$Money <- as.factor(data$Money)
+data$Power <- as.factor(data$Power)
+
+chisq.test(data$Money, data$Power)
+
+# Question number seven
+
+data_7 <- filter(data, Knowledge == 1 | Knowledge == 2)
+
+class(data_7$Knowledge)
+data_7$Knowledge <- as.factor(data_7$Knowledge)
+
+shapiro.test(data_7$Attainmentandparticipation)
+
+leveneTest(Attainmentandparticipation ~ Knowledge, data = data_7)
+
+ggplot(data_7, aes(Attainmentandparticipation, fill = Knowledge)) + 
+  geom_histogram(alpha = 0.5, aes(y = ..density..), position = 'identity')
+
+t.test(data_7$Attainmentandparticipation~data_7$Knowledge)
+
+ggplot(data_7, aes(x=Knowledge, y=Attainmentandparticipation)) + 
+  geom_boxplot()
+
+# Question number eight
+
+shapiro.test(data$Careactivities)
+
+t.test(data$Careactivities, mu = 75)
+
+# Question number nine
+
