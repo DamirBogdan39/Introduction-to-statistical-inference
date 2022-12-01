@@ -10,6 +10,10 @@ library(coin)
 library(dplyr)
 library(car)
 
+# Removing scientific notation
+
+options(scipen = 99999)
+
 # Importing the dataset
 
 data <- read_sav('GenderEqualityIndex.sav')
@@ -126,3 +130,27 @@ t.test(data$Careactivities, mu = 75)
 
 # Question number nine
 
+model9 <- lm(data$Attainmentandparticipation ~ data$Graduatesoftertiaryeducation)
+
+summary(model9)
+
+ggplot(data, aes(x=Graduatesoftertiaryeducation, y=Attainmentandparticipation)) +
+  geom_point()
+
+# Question number ten
+
+shapiro.test(data$Socialactivities)
+
+ggplot(data, aes(x=Socialactivities)) +
+  geom_histogram()
+
+model10 <- aov(Socialactivities ~ Health, data = data)
+summary(model10)
+
+ggplot(data, aes(x=Health, y=Socialactivities)) + 
+  geom_boxplot()
+
+data$Health <- as.factor(data$Health)
+class(data$Health)
+
+table(data$Health)
