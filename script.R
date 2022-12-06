@@ -1,6 +1,8 @@
 # Installing necessary libraries
+# Libraries are commented to avoid reinstalling after rerunning the code.
 
-install.packages("coin")
+#install.packages("coin")
+install.packages("skedastic")
 
 # Importing necessary libraries
 
@@ -9,6 +11,7 @@ library(ggplot2)
 library(coin)
 library(dplyr)
 library(car)
+library(skedastic)
 
 # Removing scientific notation
 
@@ -41,26 +44,31 @@ print(paste('Variance of Participation is:',
             var(data$Segregationandqualityofwork)))
 
 # Median of Parititipation compared to Segregation and quality of work
+
 if (median(data$Participation) > median(data$Segregationandqualityofwork)) {
-  print('Median of Parititipation is higher than median of Segregation and quality of work')
+  print('Median of Partitipation is higher than median of Segregation and quality of work')
 }
 
 # Range of Segregation and quality of work
+
 print(paste('Range of Segregation and quality of work is:', 
             max(data$Segregationandqualityofwork) 
            -min(data$Segregationandqualityofwork)))
 
 # Interquartile range of Participation
+
 print(paste('Interquartile range of Participation is:',
             IQR(data$Participation)))
 
 
 # Question number two
+
 table(data$Time)
 
 # Question number three
 
 # Testing the normality of distribution
+
 shapiro.test(data$Financialresources)
 
 # Testing for H0
@@ -84,6 +92,7 @@ ggplot(data_4, aes(x=Work, y=Notatriskofpoverty)) +
 # Question number five
 
 shapiro.test(data$Economicsituation)
+
 shapiro.test(data$Segregation)
 
 cor.test(data$Economicsituation, data$Segregation)
@@ -138,19 +147,40 @@ ggplot(data, aes(x=Graduatesoftertiaryeducation, y=Attainmentandparticipation)) 
   geom_point()
 
 # Question number ten
+# Changed from Health variable to Time variable
 
 shapiro.test(data$Socialactivities)
 
 ggplot(data, aes(x=Socialactivities)) +
   geom_histogram()
 
-model10 <- aov(Socialactivities ~ Health, data = data)
+model10 <- aov(Socialactivities ~ Time, data = data)
 summary(model10)
 
 ggplot(data, aes(x=Health, y=Socialactivities)) + 
   geom_boxplot()
 
-data$Health <- as.factor(data$Health)
-class(data$Health)
+class(data$Time)
+data$Time <- as.factor(data$Time)
 
-table(data$Health)
+ggplot(data, aes(x=Time, y=Socialactivities)) + 
+  geom_boxplot()
+
+# Question number eleven
+
+model11 <- lm(data$Economic ~ data$Social + 
+                data$Access + data$Political)
+
+summary(model11)
+
+# Part G) from question eleven
+# Is there a problem with multicolinearity in the model?
+
+car::vif(model11)
+
+# Part H) from question eleven
+#Is there a problem of autocorrelation in the model?
+
+car::durbinWatsonTest(model11) 
+
+skedastic::glejser(model11)
